@@ -30,7 +30,7 @@ namespace Playground.CrackingTheCode
             var currentNode = list.HeadNode;
             var lastNode = list.HeadNode;
             Hashtable listElements = new Hashtable();
-            
+
             while (currentNode != null)
             {
                 if (listElements.ContainsKey(currentNode.Value))
@@ -43,7 +43,7 @@ namespace Playground.CrackingTheCode
                     listElements.Add(currentNode.Value, true); // set any value to this key, since we won't use it.
                     lastNode = currentNode;
                 }
-                
+
                 currentNode = currentNode.NextNode;
             }
 
@@ -64,7 +64,7 @@ namespace Playground.CrackingTheCode
             if (list.HeadNode == null) return list;
 
             var currentNode = list.HeadNode;
-            
+
             while (currentNode != null)
             {
                 var currentRunnerNode = currentNode;
@@ -87,7 +87,7 @@ namespace Playground.CrackingTheCode
 
             return list;
         }
-        
+
         /// <summary>
         /// Implement an algorithm to find the kth to last element of a singly linked list
         /// Exercise 2.2
@@ -120,7 +120,7 @@ namespace Playground.CrackingTheCode
             // pop out kth element from the stack
             for (int i = 0; i < kElement; i++)
                 resultVal = stackOfValues.Pop();
-            
+
             return resultVal;
         }
 
@@ -140,7 +140,7 @@ namespace Playground.CrackingTheCode
         public static void RemoveMiddleNode(int value, DSLinkedList<int> list)
         {
             var currentNode = list.HeadNode;
-            
+
             // For value being found in the first node, do nothing.
             if (currentNode.Value.Equals(value))
                 return;
@@ -259,7 +259,8 @@ namespace Playground.CrackingTheCode
             string sumAsString = (int.Parse(sbNumber1.ToString()) + int.Parse(sbNumber2.ToString())).ToString();
 
             foreach (var sumChar in sumAsString)
-                listService.AddItem(new DSNode<int>(int.Parse(sumChar.ToString())), finalSumList, LinkedListsSupport.AddType.Head);
+                listService.AddItem(new DSNode<int>(int.Parse(sumChar.ToString())), finalSumList,
+                    LinkedListsSupport.AddType.Head);
 
             return finalSumList;
         }
@@ -308,5 +309,191 @@ namespace Playground.CrackingTheCode
             return sumNode;
         }
 
+        /// <summary>
+        /// Exercise 2.6
+        /// Is linked list a palindrome?
+        /// Time Complexity: O(N)
+        /// Space complexity: O(N)
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static bool IsLinkedListPalindrome(DSLinkedList<int> list)
+        {
+            // Empty list is not a palindrome, right?
+            if (list.HeadNode == null)
+                return false;
+
+            Stack<int> listValuesStack = new Stack<int>();
+            DSNode<int> currentNode = list.HeadNode;
+
+            // First loop to store the values
+            while (currentNode != null)
+            {
+                listValuesStack.Push(currentNode.Value);
+                currentNode = currentNode.NextNode;
+            }
+
+            // Second loop is to compare if all values are the same.
+            // Given that I don’t know the size of the list, then I need to do this second loop
+            currentNode = list.HeadNode;
+
+            while (currentNode != null)
+            {
+                int stackedValue = listValuesStack.Pop();
+                if (!stackedValue.Equals(currentNode.Value))
+                    return false;
+
+                currentNode = currentNode.NextNode;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Exercise 2.6
+        /// Same as before, but now with runner technique
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static bool IsLinkedListPalindromeRunner(DSLinkedList<int> list)
+        {
+            DSNode<int> fast = list.HeadNode;
+            DSNode<int> slow = list.HeadNode;
+
+            Stack<int> halfListValues = new Stack<int>();
+
+            while (fast != null && fast.NextNode != null)
+            {
+                halfListValues.Push(slow.Value);
+                slow = slow.NextNode;
+                fast = fast.NextNode.NextNode;
+            }
+
+            // check for odd values
+            if (fast != null)
+                slow = slow.NextNode;
+
+            while (slow != null)
+            {
+                int top = halfListValues.Pop();
+
+                // If values are different, it is not a palindrome.
+                if (!top.Equals(slow.Value))
+                    return false;
+
+                slow = slow.NextNode;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Exercise 2.7
+        /// Check if a list is intersecting with another list by reference.
+        /// Time Complexity: O(A + B)
+        /// Space Complexity: O(A) or O(B)
+        /// </summary>
+        /// <remarks>
+        ///     One approach would be to:
+        ///     - create a dictionary with Node keys and populate it with one of the lists
+        ///     - loop through the other list and check if the node exists in the first list
+        ///     - if exists, then they intersect
+        ///     - since a Dictionary is strong typed, we can store the node itself to the list. the comparison will compare both objects to check if they are the same in memory.
+        /// </remarks>
+        /// <param name="list1"></param>
+        /// <param name="list2"></param>
+        /// <returns></returns>
+        public static bool IsIntersection(DSLinkedList<int> list1, DSLinkedList<int> list2)
+        {
+            Dictionary<DSNode<int>, int> listNodes = new Dictionary<DSNode<int>, int>();
+
+            // Loop through list 1
+            var currentNode = list1.HeadNode;
+
+            while (currentNode != null)
+            {
+                listNodes.Add(currentNode, currentNode.Value);
+                currentNode = currentNode.NextNode;
+            }
+
+            // Now let's loop through the second list
+            currentNode = list2.HeadNode;
+
+            while (currentNode != null)
+            {
+                if (listNodes.ContainsKey(currentNode))
+                    return true;
+                
+                currentNode = currentNode.NextNode;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Exercise 2.8
+        /// Return the node that corrupts a linked list.
+        /// Time Complexity: O(N)
+        /// Space Complexity: O(N)
+        /// </summary>
+        /// <remarks>
+        ///     Approach:
+        ///     - throw all items in a hashtable or dictionary
+        ///     - in each iteration, check if the next node already exists.
+        ///     - if yes, then that is the corrupted node.
+        ///     - return that node.
+        /// </remarks>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static DSNode<int>? LinkedListCorrupted(DSLinkedList<int> list)
+        {
+            if (list.HeadNode == null || list.TailNode == null) return null;
+
+            Hashtable nodesTable = new Hashtable();
+            var currentNode = list.HeadNode;
+
+            while (currentNode != null)
+            {
+                // If node exists in hashtable, then the list is circular.
+                if (nodesTable.ContainsKey(currentNode))
+                    return currentNode;
+                
+                nodesTable.Add(currentNode, currentNode.Value);
+                currentNode = currentNode.NextNode;
+            }
+
+            return null;
+        }
+
+        public static DSNode<int>? LinkedListCorruptedWithCollision(DSLinkedList<int> list)
+        {
+            DSNode<int> slow = list.HeadNode;
+            DSNode<int> fast = list.HeadNode;
+
+            // Find meeting point.
+            while (fast != null && fast.NextNode != null)
+            {
+                slow = slow.NextNode;
+                fast = fast.NextNode.NextNode;
+
+                if (slow == fast) // collision!
+                    break;
+            }
+
+            // Error check to see if there is no loop. 
+            if (fast == null || fast.NextNode == null) return null;
+
+            // Moving slow to head and start walking at the same pace. They should meet each other at the collision point.
+            slow = list.HeadNode;
+
+            while (slow != fast)
+            {
+                slow = slow.NextNode;
+                fast = fast.NextNode;
+            }
+
+            // Both nodes point to the start of the loop.
+            return fast;
+        }
     }
 }

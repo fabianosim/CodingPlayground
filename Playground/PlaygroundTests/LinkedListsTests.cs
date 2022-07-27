@@ -251,5 +251,172 @@ namespace PlaygroundTests
             Assert.That(1, Is.EqualTo(sumList.NextNode.Value));
             Assert.That(9, Is.EqualTo(sumList.NextNode.NextNode.Value));
         }*/
+
+        [Test]
+        public void OnIsLinkedListPalindrome_ShouldReturnTrue()
+        {
+            // Arrange
+            DSNode<int> node1 = new DSNode<int>(1);
+            DSNode<int> node2 = new DSNode<int>(2);
+            DSNode<int> node3 = new DSNode<int>(3);
+            DSNode<int> node4 = new DSNode<int>(3);
+            DSNode<int> node5 = new DSNode<int>(2);
+            DSNode<int> node6 = new DSNode<int>(1);
+
+            DSLinkedList<int> list1 = new DSLinkedList<int>();
+            listService.AddItem(node1, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node2, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node3, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node4, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node5, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node6, list1, LinkedListsSupport.AddType.Head);
+
+            // Act
+            bool isPalindrome = LinkedLists.IsLinkedListPalindrome(list1);
+
+            // Assert
+            Assert.IsTrue(isPalindrome);
+        }
+
+        [Test]
+        public void OnIsLinkedListPalindrome_ShouldReturnFalse()
+        {
+            // Arrange
+            DSNode<int> node1 = new DSNode<int>(3);
+            DSNode<int> node2 = new DSNode<int>(2);
+            DSNode<int> node3 = new DSNode<int>(4);
+            DSNode<int> node4 = new DSNode<int>(8);
+            DSNode<int> node5 = new DSNode<int>(2);
+            DSNode<int> node6 = new DSNode<int>(7);
+
+            DSLinkedList<int> list1 = new DSLinkedList<int>();
+            listService.AddItem(node1, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node2, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node3, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node4, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node5, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node6, list1, LinkedListsSupport.AddType.Head);
+
+            // Act
+            bool isPalindrome = LinkedLists.IsLinkedListPalindrome(list1);
+
+            // Assert
+            Assert.IsFalse(isPalindrome);
+        }
+
+        [Test]
+        public void OnIsLinkedListPalindromeRunner_ShouldReturnTrue()
+        {
+            // Arrange
+            DSNode<int> node1 = new DSNode<int>(1);
+            DSNode<int> node2 = new DSNode<int>(2);
+            DSNode<int> node3 = new DSNode<int>(3);
+            DSNode<int> node4 = new DSNode<int>(3);
+            DSNode<int> node5 = new DSNode<int>(2);
+            DSNode<int> node6 = new DSNode<int>(1);
+            
+
+            DSLinkedList<int> list1 = new DSLinkedList<int>();
+            listService.AddItem(node1, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node2, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node3, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node4, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node5, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node6, list1, LinkedListsSupport.AddType.Head);
+
+            // Act
+            bool isPalindrome = LinkedLists.IsLinkedListPalindromeRunner(list1);
+
+            // Assert
+            Assert.IsTrue(isPalindrome);
+        }
+
+        [Test]
+        public void OnIsIntersection_ShouldReturnTrue()
+        {
+            // Arrange
+            // List 1
+            DSNode<int> node1 = new DSNode<int>(1);
+            DSNode<int> node2 = new DSNode<int>(1);
+            DSNode<int> node3 = new DSNode<int>(1);
+
+            // List 2
+            DSNode<int> node4 = new DSNode<int>(1);
+            DSNode<int> node5 = new DSNode<int>(1);
+            DSNode<int> node6 = new DSNode<int>(1);
+
+            DSLinkedList<int> list1 = new DSLinkedList<int>();
+            DSLinkedList<int> list2 = new DSLinkedList<int>();
+            listService.AddItem(node1, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node2, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node3, list1, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node3, list2, LinkedListsSupport.AddType.Head);// Intersection point
+            listService.AddItem(node4, list2, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node5, list2, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node6, list2, LinkedListsSupport.AddType.Head);
+
+            // Act
+            bool isIntersecting = LinkedLists.IsIntersection(list1, list2);
+
+            // Assert
+            Assert.IsTrue(isIntersecting);
+        }
+
+        [Test]
+        public void OnLinkedListCorrupted_ShouldReturnCorruptedNode()
+        {
+            // Arrange
+            DSNode<int> node1 = new DSNode<int>(1);
+            DSNode<int> node2 = new DSNode<int>(2);
+            DSNode<int> node3 = new DSNode<int>(3);
+            DSNode<int> node4 = new DSNode<int>(4);
+            DSNode<int> node5 = new DSNode<int>(1);
+            DSNode<int> node6 = new DSNode<int>(2);
+
+            DSLinkedList<int> list = new DSLinkedList<int>();
+            listService.AddItem(node1, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node2, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node3, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node4, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node5, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node6, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node3, list, LinkedListsSupport.AddType.Head);
+
+            // Act
+            DSNode<int>? corruptedNode = LinkedLists.LinkedListCorrupted(list);
+            
+            // Assert
+            Assert.IsNotNull(corruptedNode);
+            Assert.That(corruptedNode, Is.EqualTo(node3));
+        }
+
+        [Test]
+        public void OnLinkedListCorrupted_ShouldReturnCorruptedNodeWithCollision()
+        {
+            // Arrange
+            DSNode<int> node1 = new DSNode<int>(1);
+            DSNode<int> node2 = new DSNode<int>(2);
+            DSNode<int> node3 = new DSNode<int>(3);
+            DSNode<int> node4 = new DSNode<int>(4);
+            DSNode<int> node5 = new DSNode<int>(1);
+            DSNode<int> node6 = new DSNode<int>(2);
+
+            DSLinkedList<int> list = new DSLinkedList<int>();
+            listService.AddItem(node1, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node2, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node3, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node4, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node5, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node6, list, LinkedListsSupport.AddType.Head);
+            listService.AddItem(node3, list, LinkedListsSupport.AddType.Head);
+
+
+            // Act
+            DSNode<int>? corruptedNode = LinkedLists.LinkedListCorruptedWithCollision(list);
+
+            // Assert
+            Assert.IsNotNull(corruptedNode);
+            Assert.That(corruptedNode, Is.EqualTo(node3));
+        }
     }
 }
