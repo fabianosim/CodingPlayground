@@ -9,7 +9,124 @@ namespace Playground.CrackingTheCode
 {
     public class StacksAndQueues
     {
+        /// <summary>
+        /// Exercise 3.5
+        /// Sort a Stack
+        /// Time Complexity: O(N^2)
+        /// Space Complexity: O(N)
+        /// </summary>
+        /// <param name="stack"></param>
+        /// <returns></returns>
+        public static Stack<int> SortStack(Stack<int> stack, out int countOps)
+        {
+            Stack<int> tempStack = new Stack<int>();
+            countOps = 0;
+
+            if (stack.Count <= 1) return stack;
+
+            // Push the first item in the ordered stack
+            tempStack.Push(stack.Pop());
+
+            while (stack.Count > 0)
+            {
+                int tempValue = stack.Pop();
+
+                while (tempStack.Count > 0 && tempValue > tempStack.Peek())
+                {
+                    stack.Push(tempStack.Pop());
+                    countOps++;
+                }
+
+                tempStack.Push(tempValue);
+
+                countOps++;
+            }
+
+            return tempStack;
+        }
+
     }
+
+    
+
+    /// <summary>
+    /// Exercise 3.6
+    /// Animal Shelter
+    /// </summary>
+    public class AnimalShelter
+    {
+        #region Fields and Properties
+
+        public enum AnimalType
+        {
+            Dog,
+            Cat
+        };
+
+        private LinkedList<AnimalType> Shelter { get; set; }
+        
+        #endregion
+
+        #region Constructors
+
+        public AnimalShelter()
+        {
+            Shelter = new LinkedList<AnimalType>();
+        }
+
+        #endregion
+
+        #region Methods
+
+        public void Enqueue(AnimalType animalType)
+        {
+            var newAnimal = new LinkedListNode<AnimalType>(animalType);
+            Shelter.AddLast(animalType);
+        }
+
+        public LinkedListNode<AnimalType>? DequeueAny()
+        {
+            if (Shelter.Count == 0) return null;
+            var tempAnimal = Shelter.First;
+            Shelter.RemoveFirst();
+
+            return tempAnimal;
+        }
+
+        public LinkedListNode<AnimalType>? DequeueDog()
+        {
+            return DequeueAnimal(AnimalType.Dog);
+        }
+
+        public LinkedListNode<AnimalType>? DequeueCat()
+        {
+            return DequeueAnimal(AnimalType.Cat);
+        }
+
+        public LinkedListNode<AnimalType>? DequeueAnimal(AnimalType type)
+        {
+            if (Shelter.Count == 0) return null;
+            LinkedListNode<AnimalType> tempAnimal = Shelter.First;
+
+            while (tempAnimal != null)
+            {
+                if (tempAnimal.Value == type)
+                    break;
+
+                tempAnimal = tempAnimal.Next;
+            }
+
+            return tempAnimal;
+        }
+
+        public int AnimalCount()
+        {
+            return Shelter.Count;
+        }
+        #endregion
+
+    }
+
 
     /// <summary>
     /// Part of Exercise 3.3
@@ -186,7 +303,5 @@ namespace Playground.CrackingTheCode
                 }
             }
         }
-
-        
     }
 }
