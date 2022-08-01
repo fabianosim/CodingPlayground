@@ -112,5 +112,45 @@ namespace PlaygroundTests
             // Assert
             Assert.That(treesAndGraphs.GetBSTHeight(bstMinHeight.First.Value), Is.EqualTo(4));
         }
+
+        [Test]
+        public void OnListOfDepths_ShouldReturnLinkedListOfNodes()
+        {
+            // Arrange
+            TreesAndGraphs.BinaryTreeNode root = new TreesAndGraphs.BinaryTreeNode(1);
+            root.Left = new TreesAndGraphs.BinaryTreeNode(2);
+            root.Right = new TreesAndGraphs.BinaryTreeNode(3);
+            root.Right.Left = new TreesAndGraphs.BinaryTreeNode(4);
+            root.Right.Right = new TreesAndGraphs.BinaryTreeNode(5);
+            root.Right.Left.Left = new TreesAndGraphs.BinaryTreeNode(6);
+            var treesAndGraphs = new TreesAndGraphs();
+
+            // Act
+            List<LinkedList<TreesAndGraphs.BinaryTreeNode>> dephtsList = treesAndGraphs.ListOfDepths(root);
+
+            // Assert
+            Assert.That(4, Is.EqualTo(dephtsList.Count));
+
+        }
+
+        [Test]
+        public void OnListOfDepthsBFS_ShouldReturnLinkedListOfNodes()
+        {
+            // Arrange
+            TreesAndGraphs.BinaryTreeNode root = new TreesAndGraphs.BinaryTreeNode(1);
+            root.Left = new TreesAndGraphs.BinaryTreeNode(2);
+            root.Right = new TreesAndGraphs.BinaryTreeNode(3);
+            root.Right.Left = new TreesAndGraphs.BinaryTreeNode(4);
+            root.Right.Right = new TreesAndGraphs.BinaryTreeNode(5);
+            root.Right.Left.Left = new TreesAndGraphs.BinaryTreeNode(6);
+            var treesAndGraphs = new TreesAndGraphs();
+
+            // Act
+            List<LinkedList<TreesAndGraphs.BinaryTreeNode>> dephtsList = treesAndGraphs.ListOfDepthsBFS(root);
+
+            // Assert
+            Assert.That(4, Is.EqualTo(dephtsList.Count));
+
+        }
     }
 }

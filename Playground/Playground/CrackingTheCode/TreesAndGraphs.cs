@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataStructuresPlayground.Domains.BinaryTree;
 
 namespace Playground.CrackingTheCode
 {
@@ -142,5 +144,79 @@ namespace Playground.CrackingTheCode
 
             return Math.Max(leftHeight, rightHeight) + 1;
         }
-    }
+
+        public List<LinkedList<BinaryTreeNode>> ListOfDepths(BinaryTreeNode root)
+        {
+            List<LinkedList<BinaryTreeNode>> depthsList = new List<LinkedList<BinaryTreeNode>>();
+            CreateLevelLinkedList(root, depthsList, 0);
+            return depthsList;
+        }
+
+        /// <summary>
+        /// Exercise 4.3 - List of Depths - Depth-first search
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="dephtsList"></param>
+        /// <param name="level"></param>
+        public void CreateLevelLinkedList(BinaryTreeNode root, List<LinkedList<BinaryTreeNode>> dephtsList, int level)
+        {
+            if (root == null) return;
+
+            LinkedList<BinaryTreeNode> list = null;
+
+            if (dephtsList.Count == level)
+            {
+                // Levels are always traversed in order. So, if this is the first time we've
+                // visited level i, we must have seen levels 0 through i -1.
+                // We can therefore safely add the level at the end.
+                list = new LinkedList<BinaryTreeNode>();
+                dephtsList.Add(list);
+            }
+            else
+            {
+                list = dephtsList[level];
+            }
+
+            var nodeToAdd = new LinkedListNode<BinaryTreeNode>(root);
+            list.AddFirst(nodeToAdd);
+            CreateLevelLinkedList(root.Left, dephtsList, level + 1);
+            CreateLevelLinkedList(root.Right, dephtsList, level + 1);
+        }
+
+        /// <summary>
+        /// Exercise 4.3 - List of Depths - Breadth-first search
+        /// </summary>
+        public List<LinkedList<BinaryTreeNode>> ListOfDepthsBFS(BinaryTreeNode root)
+        {
+            List<LinkedList<BinaryTreeNode>> dephtsList = new List<LinkedList<BinaryTreeNode>>();
+            
+            // Visit the root
+            LinkedList<BinaryTreeNode> current = new LinkedList<BinaryTreeNode>();
+
+            if (root != null)
+            {
+                current.AddFirst(root);
+            }
+
+            while (current.Count > 0)
+            {
+                dephtsList.Add(current); // add the previous level
+                LinkedList<BinaryTreeNode> parents = current; // Go to next level
+                current = new LinkedList<BinaryTreeNode>();
+
+                foreach (var parent in parents)
+                {
+                    // Visit the children
+                    if (parent.Left != null)
+                        current.AddFirst(parent.Left);
+
+                    if (parent.Right != null)
+                        current.AddFirst(parent.Right);
+                }
+            }
+
+            return dephtsList;
+        }
+
+}
 }
