@@ -59,12 +59,13 @@ namespace DataStructuresPlayground.Services.BinaryTree
                     parent = currentNode;
                     currentNode = currentNode.Left;
                 }
-                else if (valueToCompare.CompareTo(currentNode.Value) > 0)
+
+                if (valueToCompare.CompareTo(currentNode.Value) > 0)
                 {
                     parent = currentNode;
                     currentNode = currentNode.Right;
                 }
-                    
+
             }
 
             return currentNode;

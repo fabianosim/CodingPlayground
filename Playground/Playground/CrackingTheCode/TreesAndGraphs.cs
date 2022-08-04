@@ -218,5 +218,151 @@ namespace Playground.CrackingTheCode
             return dephtsList;
         }
 
-}
+        /// <summary>
+        /// Exercise 4.4
+        /// Time Complexity: O(n)
+        /// In order to check if tree is balanced or not, we need to check both left and right nodes subtrees and see if the difference in heights is greater than 1.
+        /// Traverse the nodes using a breadth-first search algorithm, so we can pass through all sub nodes first
+        /// For each subnode, we will get the height of the tree, considering the subnode as the root.
+        /// if Math.Abs(left height - right height) is more than 1, then tree is unbalanced.
+        /// otherwise, tree is balanced
+        /// Write a method to find the height of a tree given a root node.
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        public bool IsTreeBalanced(BinaryTreeNode root)
+        {
+            // Traverse the tree and check both left and right nodes.
+            Queue<BinaryTreeNode> treeNodes = new Queue<BinaryTreeNode>();
+            treeNodes.Enqueue(root);
+
+            while (treeNodes.Count > 0)
+            {
+                BinaryTreeNode currentNode = treeNodes.Dequeue();
+                int leftHeight = 0;
+                int rightHeight = 0;
+
+                if (currentNode.Left != null)
+                {
+                    leftHeight = GetTreeHeight(currentNode.Left);
+                    treeNodes.Enqueue(currentNode.Left);
+                }
+
+                if (currentNode.Right != null)
+                {
+                    rightHeight = GetTreeHeight(currentNode.Right);
+                    treeNodes.Enqueue(currentNode.Right);
+                }
+
+                if (Math.Abs(leftHeight - rightHeight) > 1)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public int GetTreeHeight(BinaryTreeNode treeNode)
+        {
+            if (treeNode == null)
+            {
+                return -1;
+            }
+
+            int leftHeight = GetTreeHeight(treeNode.Left);
+            int rightHeight = GetTreeHeight(treeNode.Right);
+
+            if (leftHeight > rightHeight)
+                return leftHeight + 1;
+            else
+                return rightHeight + 1;
+        }
+
+        /// <summary>
+        /// Exercise 4.5 - Trees and Graphs
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        public bool IsBinarySearchTree(BinaryTreeNode root)
+        {
+            if (root == null) return true;
+
+            if (
+                (root.Left != null && root.Value.CompareTo(root.Left.Value) < 0) ||
+                (root.Right != null && root.Value.CompareTo(root.Right.Value) > 0) ||
+                ((root.Left != null && root.Right != null) && root.Left.Value.CompareTo(root.Right.Value) > 0)
+            )
+                return false;
+            
+            return IsBinarySearchTree(root.Left) && IsBinarySearchTree(root.Right);
+        }
+
+        public bool CheckBST(BinaryTreeNode root)
+        {
+            return CheckBST(root, null, null);
+        }
+
+        public bool CheckBST(BinaryTreeNode root, int? min, int? max)
+        {
+            if (root == null) return true;
+
+            if ((min != null && root.Value <= min) || (max != null && root.Value > max))
+                return false;
+
+            if (!CheckBST(root.Left, min, root.Value) || !CheckBST(root.Right, root.Value, max))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Exercise 4.6
+        /// Find the successor node
+        /// Time Complexity: O(log N) to traverse the nodes
+        /// Space Complexity: O(N) as I created a list with all nodes and levels
+        /// </summary>
+        /// <remarks>
+        ///     **** My understanding of this problem was not correct. So, my implementation works but it is different.
+        /// </remarks>
+        /// <param name="root"></param>
+        /// <param name="node"></param>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public int? NextSuccessorNode(BinaryTreeNode root, BinaryTreeNode node)
+        {
+            List<KeyValuePair<int, int>> nodesByLevel = new List<KeyValuePair<int, int>>();
+
+            // Root starts at level 1
+            MapNodesLevel(root, nodesByLevel, 1);
+
+            // Select the node  and get the next level
+            return GetNextSuccessor(nodesByLevel, node.Value);
+        }
+
+        public void MapNodesLevel(BinaryTreeNode root, List<KeyValuePair<int, int>> nodesByLevel, int level)
+        {
+            // means I reached the end
+            if (root == null)
+                return;
+
+            // Add the node and the value to the list
+            nodesByLevel.Add(new KeyValuePair<int, int>(level, root.Value));
+
+            // Store the next level
+            MapNodesLevel(root.Left, nodesByLevel, level + 1);
+            MapNodesLevel(root.Right, nodesByLevel, level + 1);
+        }
+
+        public int? GetNextSuccessor(List<KeyValuePair<int, int>> nodesByLevel, int target)
+        {
+            var currentNodeList = nodesByLevel.Where(_ => _.Value.Equals(target)).OrderBy(_ => _.Value);
+            
+            if (!currentNodeList.Any()) 
+                return null;
+
+            var nextNode = nodesByLevel.Where(_ => _.Key.Equals(currentNodeList.First().Key + 1));
+
+            return nextNode.Any() ? nextNode.First().Value : null;
+        }
+    }
 }

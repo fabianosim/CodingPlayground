@@ -152,5 +152,165 @@ namespace PlaygroundTests
             Assert.That(4, Is.EqualTo(dephtsList.Count));
 
         }
+
+        [Test]
+        public void OnIsTreeBalanced_ShouldReturnTrue()
+        {
+            // Arrange
+            TreesAndGraphs.BinaryTreeNode rootNode = new TreesAndGraphs.BinaryTreeNode(1);
+            rootNode.Left = new TreesAndGraphs.BinaryTreeNode(2);
+            rootNode.Right = new TreesAndGraphs.BinaryTreeNode(3);
+            rootNode.Right.Left = new TreesAndGraphs.BinaryTreeNode(4);
+            rootNode.Right.Right = new TreesAndGraphs.BinaryTreeNode(5);
+            rootNode.Left.Left = new TreesAndGraphs.BinaryTreeNode(6);
+            rootNode.Left.Right = new TreesAndGraphs.BinaryTreeNode(7);
+
+            var treesAndGraphs = new TreesAndGraphs();
+            
+            // Act
+            bool isBalanced = treesAndGraphs.IsTreeBalanced(rootNode);
+
+            // Assert
+            Assert.That(isBalanced, Is.True);
+        }
+
+        [Test]
+        public void OnIsTreeBalanced_ShouldReturnFalse()
+        {
+            // Arrange
+            TreesAndGraphs.BinaryTreeNode rootNode = new TreesAndGraphs.BinaryTreeNode(1);
+            rootNode.Left = new TreesAndGraphs.BinaryTreeNode(2);
+            rootNode.Right = new TreesAndGraphs.BinaryTreeNode(3);
+            rootNode.Right.Left = new TreesAndGraphs.BinaryTreeNode(4);
+            rootNode.Right.Right = new TreesAndGraphs.BinaryTreeNode(5);
+            rootNode.Left.Left = new TreesAndGraphs.BinaryTreeNode(6);
+            rootNode.Left.Right = new TreesAndGraphs.BinaryTreeNode(7);
+            rootNode.Left.Right.Right = new TreesAndGraphs.BinaryTreeNode(8);
+            rootNode.Left.Right.Right.Right = new TreesAndGraphs.BinaryTreeNode(9);
+            rootNode.Left.Right.Right.Right.Right = new TreesAndGraphs.BinaryTreeNode(10);
+
+            var treesAndGraphs = new TreesAndGraphs();
+
+            // Act
+            bool isBalanced = treesAndGraphs.IsTreeBalanced(rootNode);
+
+            // Assert
+            Assert.That(isBalanced, Is.False);
+        }
+
+        [Test]
+        public void OnIsBinarySearchTree_ShouldReturnTrue()
+        {
+            // Arrange
+            TreesAndGraphs.BinaryTreeNode rootNode = new TreesAndGraphs.BinaryTreeNode(10);
+            rootNode.Left = new TreesAndGraphs.BinaryTreeNode(6);
+            rootNode.Right = new TreesAndGraphs.BinaryTreeNode(13);
+            rootNode.Left.Left = new TreesAndGraphs.BinaryTreeNode(1);
+            rootNode.Left.Right = new TreesAndGraphs.BinaryTreeNode(8);
+            rootNode.Right.Left = new TreesAndGraphs.BinaryTreeNode(11);
+            rootNode.Right.Right = new TreesAndGraphs.BinaryTreeNode(14);
+            
+            var treesAndGraphs = new TreesAndGraphs();
+
+            // Act
+            //bool isBST = treesAndGraphs.CheckBST(rootNode);
+            bool isBST = treesAndGraphs.IsBinarySearchTree(rootNode);
+
+            // Assert
+            Assert.That(isBST, Is.True);
+        }
+
+        [Test]
+        public void OnIsBinarySearchTree_ShouldReturnTrue_Test2()
+        {
+            // Arrange
+            TreesAndGraphs.BinaryTreeNode rootNode = new TreesAndGraphs.BinaryTreeNode(10);
+            rootNode.Left = new TreesAndGraphs.BinaryTreeNode(8);
+            rootNode.Right = new TreesAndGraphs.BinaryTreeNode(12);
+            rootNode.Left.Left = new TreesAndGraphs.BinaryTreeNode(6);
+            rootNode.Left.Right = new TreesAndGraphs.BinaryTreeNode(11);
+            rootNode.Right.Left = new TreesAndGraphs.BinaryTreeNode(11);
+            rootNode.Right.Right = new TreesAndGraphs.BinaryTreeNode(13);
+
+            var treesAndGraphs = new TreesAndGraphs();
+
+            // Act
+            bool isBST = treesAndGraphs.CheckBST(rootNode);
+            //bool isBST = treesAndGraphs.IsBinarySearchTree(rootNode);
+
+            // Assert
+            Assert.That(isBST, Is.True);
+        }
+
+        [Test]
+        public void OnIsBinarySearchTree_ShouldReturnFalse()
+        {
+            // Arrange
+            TreesAndGraphs.BinaryTreeNode rootNode = new TreesAndGraphs.BinaryTreeNode(10);
+            rootNode.Left = new TreesAndGraphs.BinaryTreeNode(6);
+            rootNode.Right = new TreesAndGraphs.BinaryTreeNode(13);
+            rootNode.Left.Left = new TreesAndGraphs.BinaryTreeNode(1);
+            rootNode.Left.Right = new TreesAndGraphs.BinaryTreeNode(5);
+            rootNode.Right.Left = new TreesAndGraphs.BinaryTreeNode(11);
+            rootNode.Right.Right = new TreesAndGraphs.BinaryTreeNode(14);
+            rootNode.Right.Right.Right = new TreesAndGraphs.BinaryTreeNode(16);
+            rootNode.Right.Right.Right.Right = new TreesAndGraphs.BinaryTreeNode(18);
+
+            var treesAndGraphs = new TreesAndGraphs();
+
+            // Act
+            //bool isBST = treesAndGraphs.CheckBST(rootNode);
+            bool isBST = treesAndGraphs.IsBinarySearchTree(rootNode);
+
+            // Assert
+            Assert.That(isBST, Is.False);
+        }
+
+        [Test]
+        public void OnNextSuccessorNode_ShouldReturnNextNode()
+        {
+            // Arrange
+            TreesAndGraphs.BinaryTreeNode rootNode = new TreesAndGraphs.BinaryTreeNode(10);
+            rootNode.Left = new TreesAndGraphs.BinaryTreeNode(6);
+            rootNode.Right = new TreesAndGraphs.BinaryTreeNode(13);
+            rootNode.Left.Left = new TreesAndGraphs.BinaryTreeNode(1);
+            rootNode.Left.Right = new TreesAndGraphs.BinaryTreeNode(8);
+            rootNode.Right.Left = new TreesAndGraphs.BinaryTreeNode(11);
+            rootNode.Right.Right = new TreesAndGraphs.BinaryTreeNode(14);
+
+            var treesAndGraphs = new TreesAndGraphs();
+            TreesAndGraphs.BinaryTreeNode targetNode = rootNode.Right;
+            TreesAndGraphs.BinaryTreeNode nextSuccessorNode = rootNode.Left.Left;
+
+            // Act
+            //bool isBST = treesAndGraphs.CheckBST(rootNode);
+            int? nextNode = treesAndGraphs.NextSuccessorNode(rootNode, targetNode);
+
+            // Assert
+            Assert.That(nextNode, Is.EqualTo(nextSuccessorNode.Value));
+        }
+
+        [Test]
+        public void OnNextSuccessorNode_ShouldReturnNull()
+        {
+            // Arrange
+            TreesAndGraphs.BinaryTreeNode rootNode = new TreesAndGraphs.BinaryTreeNode(10);
+            rootNode.Left = new TreesAndGraphs.BinaryTreeNode(6);
+            rootNode.Right = new TreesAndGraphs.BinaryTreeNode(13);
+            rootNode.Left.Left = new TreesAndGraphs.BinaryTreeNode(1);
+            rootNode.Left.Right = new TreesAndGraphs.BinaryTreeNode(8);
+            rootNode.Right.Left = new TreesAndGraphs.BinaryTreeNode(11);
+            rootNode.Right.Right = new TreesAndGraphs.BinaryTreeNode(14);
+
+            var treesAndGraphs = new TreesAndGraphs();
+            TreesAndGraphs.BinaryTreeNode targetNode = rootNode.Left.Right;
+
+            // Act
+            //bool isBST = treesAndGraphs.CheckBST(rootNode);
+            int? nextNode = treesAndGraphs.NextSuccessorNode(rootNode, targetNode);
+
+            // Assert
+            Assert.That(nextNode, Is.Null);
+        }
     }
 }
