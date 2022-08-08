@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using DataStructuresPlayground.Domains.BinaryTree;
@@ -32,8 +34,8 @@ namespace Playground.CrackingTheCode
         {
             // Fields and Properties
             public int Value { get; set; }
-            public BinaryTreeNode Left { get; set; }
-            public BinaryTreeNode Right { get; set; }
+            public BinaryTreeNode? Left { get; set; }
+            public BinaryTreeNode? Right { get; set; }
 
             // Methods
             public BinaryTreeNode(int value)
@@ -104,9 +106,9 @@ namespace Playground.CrackingTheCode
             return minHeightTree;
         }*/
 
-        public LinkedList<BinaryTreeNode> BSTMinHeight(int[] orderedArray)
+        public LinkedList<BinaryTreeNode?> BSTMinHeight(int[] orderedArray)
         {
-            var list = new LinkedList<BinaryTreeNode>();
+            var list = new LinkedList<BinaryTreeNode?>();
             list.AddFirst(BSTMinNode(orderedArray, 0, orderedArray.Length - 1));
 
             return list;
@@ -119,13 +121,13 @@ namespace Playground.CrackingTheCode
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public BinaryTreeNode BSTMinNode(int[] numbers, int start, int end)
+        public BinaryTreeNode? BSTMinNode(int[] numbers, int start, int end)
         {
             if (end < start)
                 return null;
 
             int mid = (start + end) / 2;
-            BinaryTreeNode node = new BinaryTreeNode(numbers[mid]);
+            BinaryTreeNode? node = new BinaryTreeNode(numbers[mid]);
             node.Left = BSTMinNode(numbers, start, mid - 1);
             node.Right = BSTMinNode(numbers, mid + 1, end);
 
@@ -135,7 +137,7 @@ namespace Playground.CrackingTheCode
         /// <summary>
         /// Gets the height of a BST tree
         /// </summary>
-        public int GetBSTHeight(BinaryTreeNode treeNode)
+        public int GetBSTHeight(BinaryTreeNode? treeNode)
         {
             if (treeNode == null) return 0;
 
@@ -145,9 +147,9 @@ namespace Playground.CrackingTheCode
             return Math.Max(leftHeight, rightHeight) + 1;
         }
 
-        public List<LinkedList<BinaryTreeNode>> ListOfDepths(BinaryTreeNode root)
+        public List<LinkedList<BinaryTreeNode?>> ListOfDepths(BinaryTreeNode? root)
         {
-            List<LinkedList<BinaryTreeNode>> depthsList = new List<LinkedList<BinaryTreeNode>>();
+            List<LinkedList<BinaryTreeNode?>> depthsList = new List<LinkedList<BinaryTreeNode?>>();
             CreateLevelLinkedList(root, depthsList, 0);
             return depthsList;
         }
@@ -158,18 +160,18 @@ namespace Playground.CrackingTheCode
         /// <param name="root"></param>
         /// <param name="dephtsList"></param>
         /// <param name="level"></param>
-        public void CreateLevelLinkedList(BinaryTreeNode root, List<LinkedList<BinaryTreeNode>> dephtsList, int level)
+        public void CreateLevelLinkedList(BinaryTreeNode? root, List<LinkedList<BinaryTreeNode?>> dephtsList, int level)
         {
             if (root == null) return;
 
-            LinkedList<BinaryTreeNode> list = null;
+            LinkedList<BinaryTreeNode?> list = null;
 
             if (dephtsList.Count == level)
             {
                 // Levels are always traversed in order. So, if this is the first time we've
                 // visited level i, we must have seen levels 0 through i -1.
                 // We can therefore safely add the level at the end.
-                list = new LinkedList<BinaryTreeNode>();
+                list = new LinkedList<BinaryTreeNode?>();
                 dephtsList.Add(list);
             }
             else
@@ -177,7 +179,7 @@ namespace Playground.CrackingTheCode
                 list = dephtsList[level];
             }
 
-            var nodeToAdd = new LinkedListNode<BinaryTreeNode>(root);
+            var nodeToAdd = new LinkedListNode<BinaryTreeNode?>(root);
             list.AddFirst(nodeToAdd);
             CreateLevelLinkedList(root.Left, dephtsList, level + 1);
             CreateLevelLinkedList(root.Right, dephtsList, level + 1);
@@ -186,12 +188,12 @@ namespace Playground.CrackingTheCode
         /// <summary>
         /// Exercise 4.3 - List of Depths - Breadth-first search
         /// </summary>
-        public List<LinkedList<BinaryTreeNode>> ListOfDepthsBFS(BinaryTreeNode root)
+        public List<LinkedList<BinaryTreeNode?>> ListOfDepthsBFS(BinaryTreeNode? root)
         {
-            List<LinkedList<BinaryTreeNode>> dephtsList = new List<LinkedList<BinaryTreeNode>>();
+            List<LinkedList<BinaryTreeNode?>> dephtsList = new List<LinkedList<BinaryTreeNode?>>();
             
             // Visit the root
-            LinkedList<BinaryTreeNode> current = new LinkedList<BinaryTreeNode>();
+            LinkedList<BinaryTreeNode?> current = new LinkedList<BinaryTreeNode?>();
 
             if (root != null)
             {
@@ -201,8 +203,8 @@ namespace Playground.CrackingTheCode
             while (current.Count > 0)
             {
                 dephtsList.Add(current); // add the previous level
-                LinkedList<BinaryTreeNode> parents = current; // Go to next level
-                current = new LinkedList<BinaryTreeNode>();
+                LinkedList<BinaryTreeNode?> parents = current; // Go to next level
+                current = new LinkedList<BinaryTreeNode?>();
 
                 foreach (var parent in parents)
                 {
@@ -230,15 +232,15 @@ namespace Playground.CrackingTheCode
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
-        public bool IsTreeBalanced(BinaryTreeNode root)
+        public bool IsTreeBalanced(BinaryTreeNode? root)
         {
             // Traverse the tree and check both left and right nodes.
-            Queue<BinaryTreeNode> treeNodes = new Queue<BinaryTreeNode>();
+            Queue<BinaryTreeNode?> treeNodes = new Queue<BinaryTreeNode?>();
             treeNodes.Enqueue(root);
 
             while (treeNodes.Count > 0)
             {
-                BinaryTreeNode currentNode = treeNodes.Dequeue();
+                BinaryTreeNode? currentNode = treeNodes.Dequeue();
                 int leftHeight = 0;
                 int rightHeight = 0;
 
@@ -261,7 +263,7 @@ namespace Playground.CrackingTheCode
             return true;
         }
 
-        public int GetTreeHeight(BinaryTreeNode treeNode)
+        public int GetTreeHeight(BinaryTreeNode? treeNode)
         {
             if (treeNode == null)
             {
@@ -283,7 +285,7 @@ namespace Playground.CrackingTheCode
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
-        public bool IsBinarySearchTree(BinaryTreeNode root)
+        public bool IsBinarySearchTree(BinaryTreeNode? root)
         {
             if (root == null) return true;
 
@@ -297,12 +299,12 @@ namespace Playground.CrackingTheCode
             return IsBinarySearchTree(root.Left) && IsBinarySearchTree(root.Right);
         }
 
-        public bool CheckBST(BinaryTreeNode root)
+        public bool CheckBST(BinaryTreeNode? root)
         {
             return CheckBST(root, null, null);
         }
 
-        public bool CheckBST(BinaryTreeNode root, int? min, int? max)
+        public bool CheckBST(BinaryTreeNode? root, int? min, int? max)
         {
             if (root == null) return true;
 
@@ -328,7 +330,7 @@ namespace Playground.CrackingTheCode
         /// <param name="node"></param>
         /// <param name=""></param>
         /// <returns></returns>
-        public int? NextSuccessorNode(BinaryTreeNode root, BinaryTreeNode node)
+        public int? NextSuccessorNode(BinaryTreeNode? root, BinaryTreeNode? node)
         {
             List<KeyValuePair<int, int>> nodesByLevel = new List<KeyValuePair<int, int>>();
 
@@ -339,7 +341,7 @@ namespace Playground.CrackingTheCode
             return GetNextSuccessor(nodesByLevel, node.Value);
         }
 
-        public void MapNodesLevel(BinaryTreeNode root, List<KeyValuePair<int, int>> nodesByLevel, int level)
+        public void MapNodesLevel(BinaryTreeNode? root, List<KeyValuePair<int, int>> nodesByLevel, int level)
         {
             // means I reached the end
             if (root == null)
@@ -364,5 +366,98 @@ namespace Playground.CrackingTheCode
 
             return nextNode.Any() ? nextNode.First().Value : null;
         }
+
+        /// <summary>
+        /// Exercise 4.8
+        /// Find Common Ancestor
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="p"></param>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        public BinaryTreeNode? CommonAncestor(BinaryTreeNode? root, BinaryTreeNode? p, BinaryTreeNode? q)
+        {
+            // Error check: one node is not in the tree.
+            if (!Covers(root, p) || !Covers(root, q))
+                return null;
+
+            return AncestorHelper(root, p, q);
+        }
+
+        public BinaryTreeNode? AncestorHelper(BinaryTreeNode? root, BinaryTreeNode? p, BinaryTreeNode? q)
+        {
+            if (root == null || root == p || root == q)
+                return root;
+
+            bool pIsOnLeft = Covers(root.Left, p);
+            bool qIsOnLeft = Covers(root.Left, q);
+
+            // p and q are on different sides. Root is the ancestor.
+            if (pIsOnLeft != qIsOnLeft)
+                return root;
+                
+            BinaryTreeNode? childSide = pIsOnLeft ? root.Left : root.Right;
+
+            return AncestorHelper(childSide, p, q);
+        }
+
+        public bool Covers(BinaryTreeNode? root, BinaryTreeNode? node)
+        {
+            if (root == null) return false;
+            if (root == node) return true;
+
+            return Covers(root.Left, node) || Covers(root.Right, node);
+        }
+
+        /// <summary>
+        /// Exercise 4.9
+        /// Print all sequences of a binary search tree
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        //public List<LinkedList<int>> AllSequences(BinaryTreeNode root)
+        //{
+        //    List<LinkedList<int>> result = new List<LinkedList<int>>();
+
+        //    if (root == null)
+        //    {
+        //        result.Add(new LinkedList<int>());
+        //        return result;
+        //    }
+
+        //    LinkedList<int> prefix = new LinkedList<int>();
+        //    prefix.AddFirst(root.Value);
+
+        //    // Recurse on left and right subtrees
+        //    List<LinkedList<int>> leftSequence = AllSequences(root.Left);
+        //    List<LinkedList<int>> rightSequence = AllSequences(root.Right);
+
+        //    // Weave together each list from the left and right sides
+        //    foreach (var left in leftSequence)
+        //    {
+        //        foreach (var right in rightSequence)
+        //        {
+        //            var weaved = new List<LinkedList<int>>();
+        //            WeaveLists(left, right, weaved, prefix);
+        //            result.Add(weaved);
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
+        //// Weave lists together in all possible ways. 
+        //public void WeaveLists(LinkedList<int> first, LinkedList<int> second, List<LinkedList<int>> results,
+        //    LinkedList<int> prefix)
+        //{
+
+        //    // One list is empty. Add a remainder to [a cloned]  prefix and store the result.
+        //    if (first.Count == 0 || second.Count == 0
+        //    {
+        //        LinkedList<int> result = prefix;
+        //        result.Append(first);
+
+        //    })
+        //}
     }
 }
