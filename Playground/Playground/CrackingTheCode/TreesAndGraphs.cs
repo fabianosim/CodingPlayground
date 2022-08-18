@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
@@ -24,10 +25,6 @@ namespace Playground.CrackingTheCode
 	    A binary search tree with minimal height is a tree containing all leaf nodes in the same level.
 	    In order to be a binary search tree, the tree must contain the smallest elements on the left, the highest elements to the right and the root node is the smallest one. It should be a complete and balanced binary tree.
 
-	    Questions: 
-        Should I validate if the array is unordered? 
-        Should I order the array if it is unordered? 
-	        Such algorithm can be:
         */
         
         public class BinaryTreeNode
@@ -36,11 +33,58 @@ namespace Playground.CrackingTheCode
             public int Value { get; set; }
             public BinaryTreeNode? Left { get; set; }
             public BinaryTreeNode? Right { get; set; }
+            public int Size { get; set; }
 
             // Methods
             public BinaryTreeNode(int value)
             {
                 Value = value;
+                Size = 1;
+            }
+
+            /// <summary>
+            /// Inserts a node in order.
+            /// </summary>
+            /// <param name="newValue"></param>
+            public void InsertInOrder(int newValue)
+            {
+                if (newValue < Value)
+                {
+                    if (Left == null)
+                        Left = new BinaryTreeNode(newValue);
+                    else
+                        Left.InsertInOrder(newValue);
+                }
+                else
+                {
+                    if (Right == null)
+                        Right = new BinaryTreeNode(newValue);
+                    else
+                        Right.InsertInOrder(newValue);
+                }
+
+                Size++;
+            }
+
+            /// <summary>
+            /// Gets a random node with equal probability for each node
+            /// Only works for complete binary search trees
+            /// </summary>
+            /// <returns></returns>
+            public BinaryTreeNode GetRandomNode()
+            {
+                int leftSize = Left == null ? 0 : Left.Size;
+                Random rand = new Random();
+
+                int index = rand.Next(Size);
+
+                if (index < Size && Left != null)
+                    return Left.GetRandomNode();
+                
+                if (index == leftSize)
+                    return this;
+                
+                return Right == null ? this : Right.GetRandomNode();
             }
         }
 
@@ -407,6 +451,378 @@ namespace Playground.CrackingTheCode
             if (root == node) return true;
 
             return Covers(root.Left, node) || Covers(root.Right, node);
+        }
+
+        /// <summary>
+        /// Exercise 4.10
+        /// Checks if T2 is a subtree of T1
+        /// </summary>
+        /// <remarks>
+        ///     Strategy:
+        ///     - Get both roots of each binary tree
+        ///     - Traverse t1 searching the t2 root node. For that, we can use Breadth First Search, so we can traverse all the nodes.
+        ///     - If the node is found, then we perform a Breadth First Search on this t1 node.
+        ///     - We can perform a BFS at the same time in T2, and when we dequeue the node to find the solution, we compare each node
+        ///     - If we reach the end of T2 queue, that means all items are equal and T2 is a subtree of T1. Otherwise, we return false and continue with DFS.
+        ///     - In order to keep track of visited nodes on BFS, we can use separated hash maps.
+        ///
+        ///     Time Complexity:
+        ///     - We would have O(n) time complexity for the first traversal using BFS, and O(t) for the second traversal using T2.
+        ///     - The final time complexity would be O(n*t), where n is the number of nodes from T1 and t is the number of nodes for T2.
+        ///
+        ///     Questions:
+        ///     - What if we would have a binary search tree instead of a tree?
+        ///         - Then the search would be faster
+        /// </remarks>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <returns></returns>
+        public bool CheckSubtree(BinaryTreeNode t1, BinaryTreeNode t2)
+        {
+            // Base case
+            if (t1 == null || t2 == null) return false;
+
+            bool isSubtree = false;
+
+            // Perform Depth First search on T1 for the root node of T2
+            Queue<BinaryTreeNode> qT1 = new Queue<BinaryTreeNode>();
+            Dictionary<BinaryTreeNode, bool> visitedT1 = new Dictionary<BinaryTreeNode, bool>();
+
+            qT1.Enqueue(t1);
+
+            while (qT1.Count > 0)
+            {
+                var currentT1Node = qT1.Dequeue();
+
+                if (currentT1Node == null)
+                    continue;
+
+                // Node found, let's compare both trees
+                if (visitedT1.ContainsKey(currentT1Node)) 
+                    continue;
+
+                // first comparison will avoid searching the tree for different items
+                if (currentT1Node.Value.Equals(t2.Value) && CompareTrees(currentT1Node, t2))
+                {
+                    isSubtree = true;
+                    break;
+                }
+
+                qT1.Enqueue(currentT1Node.Left);
+                qT1.Enqueue(currentT1Node.Right);
+
+                visitedT1.Add(currentT1Node, true);
+            }
+
+            return isSubtree;
+        }
+
+        /// <summary>
+        /// Compare both trees.
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <returns>If they are equal, return true. False otherwise.</returns>
+        private bool CompareTrees(BinaryTreeNode t1, BinaryTreeNode t2)
+        {
+            Dictionary<BinaryTreeNode, bool> visitedNodes = new Dictionary<BinaryTreeNode, bool>();
+            Queue<BinaryTreeNode> qT1 = new Queue<BinaryTreeNode>();
+            Queue<BinaryTreeNode> qT2 = new Queue<BinaryTreeNode>();
+
+            // those will be dequeued and enqueued at the same time.
+            qT1.Enqueue(t1);
+            qT2.Enqueue(t2);
+
+            while (qT2.Count > 0)
+            {
+                var currentT1Node = qT1.Dequeue();
+                var currentT2Node = qT2.Dequeue();
+
+                // Visiting the node
+                if (currentT1Node != null && currentT2Node != null && currentT1Node.Value.Equals(currentT2Node.Value))
+                {
+                    if (!visitedNodes.ContainsKey(currentT2Node))
+                    {
+                        qT1.Enqueue(currentT1Node.Left);
+                        qT1.Enqueue(currentT1Node.Right);
+                        qT2.Enqueue(currentT2Node.Left);
+                        qT2.Enqueue(currentT2Node.Right);
+
+                        // As T1 is only mirrored, then I just need one queue to track visited items.
+                        visitedNodes.Add(currentT2Node, true);
+                    }
+                }
+                else
+                {
+                    // if both values are null, then continue. Tree is supposed to be equal.
+                    if (currentT1Node == null && currentT2Node == null)
+                        continue;
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Exercise 4.10
+        /// Checks if t2 is a subtree of t1
+        /// Uses a recursive approach
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <returns></returns>
+        public bool CheckSubTreeRecursive(BinaryTreeNode t1, BinaryTreeNode t2)
+        {
+            // t2 null is always a subtree of t1
+            if (t2 == null) 
+                return true;
+
+            return SubTree(t1, t2);
+        }
+
+        private bool SubTree(BinaryTreeNode t1, BinaryTreeNode t2)
+        {
+            // If bigger tree is null, t2 is still not found
+            if (t1 == null)
+                return false;
+
+            if (t1.Value == t2.Value && MatchTree(t1, t2))
+                return true;
+
+            return SubTree(t1.Left, t2) || SubTree(t1.Right, t2);
+        }
+
+        private bool MatchTree(BinaryTreeNode t1, BinaryTreeNode t2)
+        {
+            if (t1 == null && t2 == null)
+                return true; // nothing left in the subtree
+
+            if (t1 == null || t2 == null)
+                return false; // one of the trees is empty, so they don't match
+
+            if (!t1.Value.Equals(t2.Value))
+                return false;
+
+            return MatchTree(t1.Left, t2.Left) && MatchTree(t1.Right, t2.Right);
+        }
+
+        /// <summary>
+        /// Exercise 4.11
+        /// Get a random node given a binary tree.
+        /// </summary>
+        /// <remarks>
+        ///     Strategy:
+        ///     - Approach 1:
+        ///         - As all nodes should be equally likely to be chosen, we might need the amount of nodes to get a random order.
+        ///         - Assuming that we don't have the number of nodes, we need to calculate them first.
+        ///         - Traverse through the tree once just to get the number of nodes.
+        ///         - Use the random class to get a random number between 1 and the number of nodes
+        ///         - Traverse the tree again using the same algorithm
+        ///         - Return the node defined by the random sequence number taken.
+        ///     - Approach 2:
+        ///         - We can traverse the tree just once and, for each visit, decide if the node will be taken or not.
+        ///         - We can use the value of each node and check if it is divisible by a random number between 1 and 5, for example
+        ///         - if yes, we return that node
+        ///
+        /// Hints: #42, #54, #62, #75, #89, #99, #112, #119
+        /// </remarks>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        public BinaryTreeNode GetRandomNode(BinaryTreeNode root)
+        {
+            // tree is null, no need to get any node.
+            if (root == null)
+                return null;
+
+            // Set a seed between 1 and 10
+            Random randNumber = new Random();
+            int seed = randNumber.Next(1, 10);
+            
+            // Traverse through the tree using a pre-order traversal
+            if (ShouldGetNode(root, seed))
+                return root;
+
+            var randLeftNode = GetRandomNode(root.Left);
+            var randRightNode = GetRandomNode(root.Right);
+
+            if (randLeftNode != null)
+                return randLeftNode;
+            
+            return randRightNode;
+        }
+
+        private bool ShouldGetNode(BinaryTreeNode node, int seed)
+        {
+            if (node.Value % seed == 0)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Calculates the percentage for each node in the binary tree for GetRandomNode method.
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="samplesCount"></param>
+        /// <returns></returns>
+        public Dictionary<int, float> GetRandomNodeStatistic(BinaryTreeNode root, float samplesCount)
+        {
+            var statistics = new Dictionary<int, float>();
+            var treeValuesCount = new Dictionary<int, int>();
+
+            if (samplesCount <= 0)
+                samplesCount = 1;
+
+            for (int i = 0; i < samplesCount; i++)
+            {
+                BinaryTreeNode randNode = GetRandomNode(root);
+
+                if (randNode == null)
+                {
+                    i--;
+                    continue;
+                }
+                
+                if (treeValuesCount.ContainsKey(randNode.Value))
+                    treeValuesCount[randNode.Value]++;
+                else
+                    treeValuesCount.Add(randNode.Value, 1);
+            }
+
+            foreach (KeyValuePair<int, int> treeValue in treeValuesCount)
+            {
+                float percentage = (treeValue.Value / samplesCount);
+                statistics.Add(treeValue.Key, percentage * 100);
+            }
+
+            return statistics;
+        }
+
+        /// <summary>
+        /// Calculates the percentage for each node in the binary tree for GetRandomNode method.
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="samplesCount"></param>
+        /// <returns></returns>
+        public Dictionary<int, float> GetBalancedRandomNodeStatistic(BinaryTreeNode root, float samplesCount)
+        {
+            var statistics = new Dictionary<int, float>();
+            var treeValuesCount = new Dictionary<int, int>();
+
+            if (samplesCount <= 0)
+                samplesCount = 1;
+
+            for (int i = 0; i < samplesCount; i++)
+            {
+                BinaryTreeNode randNode = root.GetRandomNode();
+
+                if (randNode == null)
+                {
+                    i--;
+                    continue;
+                }
+
+                if (treeValuesCount.ContainsKey(randNode.Value))
+                    treeValuesCount[randNode.Value]++;
+                else
+                    treeValuesCount.Add(randNode.Value, 1);
+            }
+
+            foreach (KeyValuePair<int, int> treeValue in treeValuesCount)
+            {
+                float percentage = (treeValue.Value / samplesCount);
+                statistics.Add(treeValue.Key, percentage * 100);
+            }
+
+            return statistics;
+        }
+
+        /// <summary>
+        ///     Paths with Sum: You are given a binary tree in which each node contains an integer value
+        ///     (which might be positive or negative). Design an algorithm to count the number of paths that sum to a given value.
+        ///     The path does not need to start or end at the root or a leaf, but it must go downwards (traveling only from parent nodes to child nodes).
+        ///     Hints:#6, #14, #52, #68, #77, #87, #94, #103, #108, #115
+        /// </summary>
+        /// <remarks>
+        ///     Consider an example:
+        ///     Binary tree:
+        ///
+        ///              5
+        ///         4         6
+        ///      2     3   6     8
+        ///
+        ///     Let's say the given value is 12.
+        ///     To reach this sum, we can use the following paths:
+        ///         5, 4, 3
+        ///         6, 6
+        ///     So, the answer would be 2.
+        ///
+        ///     Strategy:
+        ///         - Since it goes only downwards, we can start the sum with the root node.
+        ///         - For each child node of root, we can use BFS to traverse widely and check using DFS on each
+        ///         - In order to check if a node will be linked to items that will give a sum, we can traverse the tree using DFS
+        ///         - For each node, we try to build a path to the sum.
+        ///             - While the sum is smaller than the target value, keep adding the values
+        ///             - If the sum of the values in a given path is greater, than that path is not the one we want
+        ///             - If the sum is exactly the same, then the path is a valid one. Increment the totalPaths then.
+        ///
+        ///     Time Complexity:
+        ///     - first BFS will be O(n) where n is the number of nodes
+        ///     - second DFS will be O(m) where m is the number of the nodes in a path
+        ///     - final time complexity will be something like O(n*m)
+        ///     - Space complexity would be something like O(n) (queue and hashset for the BFS) and O(1) for DFS. Overall space complexity is O(n);
+        /// </remarks>
+        public int PathsWithSums(BinaryTreeNode root, int targetSum)
+        {
+            int totalPaths = 0;
+            Queue<BinaryTreeNode> queueNodes = new Queue<BinaryTreeNode>();
+            HashSet<BinaryTreeNode> visitedNodes = new HashSet<BinaryTreeNode>();
+            
+            queueNodes.Enqueue(root);
+
+            while (queueNodes.Count > 0)
+            {
+                var currentNode = queueNodes.Dequeue();
+
+                if (visitedNodes.Contains(currentNode) || currentNode == null)
+                    continue;
+                
+                totalPaths += GetPaths(currentNode, targetSum, 0, 0);
+                queueNodes.Enqueue(currentNode.Left);
+                queueNodes.Enqueue(currentNode.Right);
+                visitedNodes.Add(currentNode);
+            }
+            
+            return totalPaths;
+        }
+
+        public int GetPaths(BinaryTreeNode node, int targetSum, int currentSum, int paths)
+        {
+            if (node == null) // reached the end
+            {
+                if (targetSum.Equals(currentSum))
+                    return paths++; //it is a valid path
+                
+                return 0;
+            }
+                
+            if (node.Value + currentSum < targetSum)
+            {
+                currentSum += node.Value;
+                paths = GetPaths(node.Left, targetSum, currentSum, paths) + GetPaths(node.Right, targetSum, currentSum, paths);
+            }
+            else if ((node.Value + currentSum) > targetSum)
+            {
+                return 0;
+            }
+            else
+            {
+                paths++; // valid path is found, since the sum has reached the targetSum
+            }
+
+            return paths;
         }
 
         /// <summary>
